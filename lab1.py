@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+from utils import Plot, draw
 
 
 a = -1
@@ -16,15 +16,6 @@ t3_c = 21
 t4_c = 26
 
 NList = [1, 3, 4, 5, 15]
-
-
-class Plot:
-
-    def __init__(self, x, y, xLabel, yLabel):
-        self.x = x
-        self.y = y
-        self.xLabel = xLabel
-        self.yLabel = yLabel
 
 
 # Функция квадратной волны
@@ -74,39 +65,6 @@ def f_complex(space):
     return result
 
 
-def draw(plots, title, setLimits=True, isPeriodic=True):
-    if len(plots) == 0:
-        raise "Zero plots 've been given"
-    ax = plt.subplot(1, 1, 1)
-    colors = ["r", "b", "g", "p"]
-    labelsY = []
-    labelsX = []
-
-    T = t2 - t0
-
-    for i in range(0, len(plots)):
-        plot, color = plots[i], colors[i % len(colors)]
-        x, y, xLabel, yLabel = plot.x, plot.y, plot.xLabel, plot.yLabel
-
-        ax.plot(x, y, "-")
-        if isPeriodic:
-            ax.plot(x - T, y, "-")
-            ax.plot(x + T, y, "-")
-
-        labelsY.append(yLabel)
-        labelsX.append(xLabel)
-
-    plt.xlabel(labelsX[0])
-    plt.ylabel(labelsY[0])
-    if setLimits:
-        plt.xlim(-2.5, 2.5)
-        plt.ylim(-1.2, 1.2)
-    plt.title(title)
-    plt.grid(True)
-    plt.legend(labelsY)
-    plt.show()
-
-
 def omega(n, T=t2-t0):
     return 2*np.pi*n/T
 
@@ -123,7 +81,7 @@ def calc(t, y, n):
 
 def F_G_N(t, y, label, isSquare=False):
     plots = [Plot(t, y, "t", "f(t)")]
-    draw(plots, label)
+    draw(plots, label, T=t2-t0)
 
     T = t2 - t0
 
@@ -145,8 +103,8 @@ def F_G_N(t, y, label, isSquare=False):
 
             G += cn * (np.cos(omg * t) + 1j * np.sin(omg * t))
 
-        draw([(Plot(t, F, "t", "Fn(t) n = " + str(N)))], label)
-        draw([Plot(t, G, "t", "Gn(t) n = " + str(N))], label)
+        draw([(Plot(t, F, "t", "Fn(t) n = " + str(N)))], label,  T=t2-t0)
+        draw([Plot(t, G, "t", "Gn(t) n = " + str(N))], label,  T=t2-t0)
 
     ##draw(plots, label)
 
@@ -217,13 +175,13 @@ def createComplex():
 
         G_r = np.real(G)
         G_i = np.imag(G)
-        draw([Plot(t, G_i, "t", "G_i_n(t) n = " + str(N))], label + " G_i(t)", setLimits=False, isPeriodic=False)
-        draw([Plot(t, G_r, "t", "G_r_n(t) n = " + str(N))], label + " G_r(t)", setLimits=False, isPeriodic=False)
+        draw([Plot(t, G_i, "t", "G_i_n(t) n = " + str(N))], label + " G_i(t)", setLimits=False)
+        draw([Plot(t, G_r, "t", "G_r_n(t) n = " + str(N))], label + " G_r(t)", setLimits=False)
         draw([Plot(G_r, G_i, "t", "Gn(t) n = " + str(N))],
-             label, setLimits=False, isPeriodic=False)
+             label, setLimits=False)
 
     draw([Plot(np.real(c), np.imag(c), "", "")],
-         label, setLimits=False, isPeriodic=False)
+         label, setLimits=False)
 
 
 if __name__ == '__main__':
