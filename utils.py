@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import librosa
 import pydub
 import numpy as np
 
@@ -45,12 +46,7 @@ def draw(plots, title, setLimits=True, limits=(2.5, 1.2), T=None):
     plt.show()
 
 
-def readAudio(f, normalized=False):
-    a = pydub.AudioSegment.from_mp3(f)
-    y = np.array(a.get_array_of_samples())
-    if a.channels == 2:
-        y = y.reshape((-1, 2))
-    if normalized:
-        return a.frame_rate, np.float32(y) / 2 ** 15
-    else:
-        return a.frame_rate, y
+def readAudio(f):
+    y, sr = librosa.load(f)
+    y = librosa.to_mono(y)
+    return y
