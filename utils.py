@@ -38,8 +38,10 @@ def draw(plots, title, setLimits=True, limits=(2.5, 1.2), T=None):
     plt.xlabel(labelsX[0])
     plt.ylabel(labelsY[0])
     if setLimits:
-        plt.xlim(-limits[0], limits[0])
-        plt.ylim(-limits[1], limits[1])
+        if limits[0] != 0:
+            plt.xlim(-limits[0], limits[0])
+        if limits[1] != 0:
+            plt.ylim(-limits[1], limits[1])
     plt.title(title)
     plt.grid(True)
     plt.legend(labelsY)
