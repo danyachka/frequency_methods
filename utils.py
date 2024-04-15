@@ -13,7 +13,9 @@ class Plot:
         self.yLabel = yLabel
 
 
-def draw(plots, title, setLimits=True, limits=(2.5, 1.2), T=None):
+def draw(plots: Plot | list[Plot], title: str, setLimits=True, limits=(2.5, 1.2), T=None):
+    if isinstance(plots, Plot):
+        plots = [plots]
     if len(plots) == 0:
         raise "Zero plots 've been given"
     ax = plt.subplot(1, 1, 1)
