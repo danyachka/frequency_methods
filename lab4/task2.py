@@ -4,12 +4,12 @@ import matplotlib.pyplot as plt
 
 
 def first_order_filter(T):
-    return np.poly1d([1]), np.poly1d([1, T])
+    return np.poly1d([1]), np.poly1d([T, 1])
 
 
 def special_filter(T1, T2, T3):
     #return np.poly1d([1, 2*T1, T1**2]), np.poly1d([1, T2 + T3, T2*T3]) #np.polymul([T2, 1], [T3, 1])
-    return [1, 2*T1, T1**2], [1, T2 + T3, T2*T3] # np.polymul([T2, 1], [T3, 1])
+    return [T1**2, 2*T1, 1], [T2*T3, T2 + T3, 1] # np.polymul([T2, 1], [T3, 1])
 
 
 def plot_signals(t, u, filtered_u, filter_type, T_values=None):
@@ -32,6 +32,7 @@ def plot_signals(t, u, filtered_u, filter_type, T_values=None):
     plt.subplot(size[0], size[1], 2)
     plt.plot(t, filtered_u, label='Фильтрованный сигнал', color='orange')
     plt.title('Фильтрованный сигнал ({})'.format(filter_type))
+    plt.xlim((0, 10))
     plt.xlabel('Время')
     plt.ylabel('Амплитуда')
     plt.legend()
@@ -100,9 +101,9 @@ def main():
         # Сигнал u
         u1 = g + b * (np.random.rand(len(t)) - 0.5)
 
-        T = -0.9
-        T_1 = -0.5
-        T_2 = -0.7
+        T = -1.2
+        T_1 = -1.5
+        T_2 = -1.9
         num, den = first_order_filter(T)
         num1, den1 = first_order_filter(T_1)
         num2, den2 = first_order_filter(T_2)
@@ -116,9 +117,9 @@ def main():
     def special():
         u2 = g + c * np.sin(d * t)
         # Подбираем значения для специального фильтра
-        T1 = 0.01
-        T2 = 0.3
-        T3 = 0.3
+        T1 = 1.6
+        T2 = 2
+        T3 = 0.5
 
         # Применяем специальный фильтр
         num, den = special_filter(T1, T2, T3)

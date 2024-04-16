@@ -201,23 +201,23 @@ def secondTask():
 
 
 def thirdTask():
-    path = os.path.dirname(os.path.realpath(__file__)) + "\\data\\lab2\\audio.mp3"
+    path = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "\\data\\lab2\\audio.mp3"
     print(path)
     y = readAudio(path)
 
     t = np.linspace(0, len(y), len(y))
-    draw([Plot(t, y, "t", "")],
+    draw([Plot(t, y, "t", None)],
          "Аудиозапись, f(t)", setLimits=False)
 
     V = 1000
-    v = [i for i in range(0, V)]
+    v = [i for i in range(-V + 1, V)]
 
     Y = np.zeros(len(v))
 
     for k in range(len(v)):
         Y[k] = abs(np.trapz(t, y * np.exp(-2j * np.pi * v[k] * t)))
 
-    draw([Plot(v, Y, "Частоты", "")],
+    draw([Plot(v, Y, "Частоты", None)],
          "Аудиозапись, abs(f^(t))", setLimits=False)
 
     highest = []
@@ -237,9 +237,9 @@ def thirdTask():
 
 
 def main():
-    drawFirstDefault()
+    #drawFirstDefault()
     #secondTask()
-    #thirdTask()
+    thirdTask()
 
 
 if __name__ == '__main__':

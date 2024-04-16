@@ -34,11 +34,15 @@ def draw(plots: Plot | list[Plot], title: str, setLimits=True, limits=(2.5, 1.2)
             ax.plot(x - T, y, "-")
             ax.plot(x + T, y, "-")
 
-        labelsY.append(yLabel)
+        if yLabel is not None:
+            labelsY.append(yLabel)
         labelsX.append(xLabel)
 
     plt.xlabel(labelsX[0])
-    plt.ylabel(labelsY[0])
+    if len(labelsY) != 0:
+        plt.ylabel(labelsY[0])
+        plt.legend(labelsY)
+
     if setLimits:
         if limits[0] != 0:
             plt.xlim(-limits[0], limits[0])
@@ -46,7 +50,6 @@ def draw(plots: Plot | list[Plot], title: str, setLimits=True, limits=(2.5, 1.2)
             plt.ylim(-limits[1], limits[1])
     plt.title(title)
     plt.grid(True)
-    plt.legend(labelsY)
     plt.show()
 
 
