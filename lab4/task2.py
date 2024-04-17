@@ -9,7 +9,7 @@ def first_order_filter(T):
 
 def special_filter(T1, T2, T3):
     #return np.poly1d([1, 2*T1, T1**2]), np.poly1d([1, T2 + T3, T2*T3]) #np.polymul([T2, 1], [T3, 1])
-    return [T1**2, 2*T1, 1], [T2*T3, T2 + T3, 1] # np.polymul([T2, 1], [T3, 1])
+    return np.poly1d([T1**2, 2*T1, 1]), np.poly1d([T2*T3, T2 + T3, 1]) # np.polymul([T2, 1], [T3, 1])
 
 
 def plot_signals(t, u, filtered_u, filter_type, T_values=None):
@@ -54,7 +54,7 @@ def plot_signals(t, u, filtered_u, filter_type, T_values=None):
     if filter_type == 'Фильтр первого порядка':
         T = list(T_values.keys())[0]
         num, den = first_order_filter(T)
-    elif 'Специальный фильтр' in filter_type:
+    else:
         #T1, T2, T3 = filter_type.split('(')[1].split(')')[0].split(',')
         T1, T2, T3 = T_values
         num, den = special_filter(T1, T2, T3)
@@ -70,7 +70,7 @@ def plot_signals(t, u, filtered_u, filter_type, T_values=None):
     if filter_type == 'Фильтр первого порядка':
         plt.subplot(size[0], size[1], 5)
         for T_val, filtered_sig in T_values.items():
-            plt.plot(t, filtered_sig, label='T={}'.format(T_val))
+            plt.plot(t, filtered_sig, label='T={}'.format(abs(T_val)))
         plt.title('Фильтрованный сигнал (Разные T)')
         plt.xlabel('Время')
         plt.ylabel('Амплитуда')
@@ -85,7 +85,7 @@ def main():
     a = 1.3
     b = 0.5  # Амплитуда случайной составляющей
     c = 0.5  # Амплитуда синусоидальной составляющей
-    d = 1  # Частота синусоидальной составляющей
+    d = 50  # Частота синусоидальной составляющей
 
     # Время
     t = np.linspace(0, 10, 1000)
@@ -104,6 +104,11 @@ def main():
         T = -1.2
         T_1 = -1.5
         T_2 = -1.9
+
+        # T = 2000
+        # T_1 = 1.5
+        # T_2 = 1.1
+
         num, den = first_order_filter(T)
         num1, den1 = first_order_filter(T_1)
         num2, den2 = first_order_filter(T_2)
@@ -117,16 +122,16 @@ def main():
     def special():
         u2 = g + c * np.sin(d * t)
         # Подбираем значения для специального фильтра
-        T1 = 1.6
-        T2 = 2
-        T3 = 0.5
+        T1 = -12
+        T2 = -1.9
+        T3 = -1.1
 
         # Применяем специальный фильтр
         num, den = special_filter(T1, T2, T3)
         filtered = signal.filtfilt(num, den, u2)
 
         # Строим графики для специального фильтра
-        plot_signals(t, u2, filtered, 'Специальный фильтр (T1={}, T2={}, T3={})'.format(T1, T2, T3),
+        plot_signals(t, u2, filtered, 'T1={}, T2={}, T3={}'.format(abs(T1), abs(T2), abs(T3)),
                      T_values=[T1, T2, T3])
 
     #default()
