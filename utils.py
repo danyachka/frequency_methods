@@ -50,6 +50,7 @@ def draw(plots: Plot | list[Plot], title: str, setLimits=True, limits=(2.5, 1.2)
             plt.ylim(-limits[1], limits[1])
     plt.title(title)
     plt.grid(True)
+    plt.tight_layout()
     plt.show()
 
 
