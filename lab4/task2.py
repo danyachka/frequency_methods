@@ -48,11 +48,9 @@ def plot_signals(t, u, filtered_u, filter_type, T_values=None, a=-1):
 
     # Модули Фурье-образов
     plt.subplot(size[0], size[1], 3)
-    #v, u_fourier = signal.periodogram(u)
     v, u_fourier = fourier_transform_trapezoidal(u, t[1] - t[0], t)
     plt.semilogy(v, u_fourier, label='Исходный сигнал')
     v, filtered_u_fourier = fourier_transform_trapezoidal(filtered_u, t[1] - t[0], t)
-    #v, filtered_u_fourier = signal.periodogram(filtered_u)
     plt.semilogy(v, filtered_u_fourier, label='Фильтрованный сигнал', color='orange')
     plt.title('Модули Фурье-образов')
     plt.xlabel('Частота')
@@ -67,7 +65,6 @@ def plot_signals(t, u, filtered_u, filter_type, T_values=None, a=-1):
         num, den = first_order_filter(T)
         filter_ = signal.TransferFunction(num, den)
     else:
-        #T1, T2, T3 = filter_type.split('(')[1].split(')')[0].split(',')
         T1, T2, T3 = T_values
         num, den = special_filter(T1, T2, T3)
         filter_ = signal.TransferFunction(num, den)
@@ -78,16 +75,6 @@ def plot_signals(t, u, filtered_u, filter_type, T_values=None, a=-1):
     plt.xlabel('Частота')
     plt.ylabel('Амплитуда')
     plt.legend()
-
-    # Влияние постоянной времени T
-    # if filter_type == 'Фильтр первого порядка':
-    #     plt.subplot(size[0], size[1], 5)
-    #     for T_val, filtered_sig in T_values.items():
-    #         plt.plot(t, filtered_sig, label='T={}'.format(T_val))
-    #     plt.title('Фильтрованный сигнал (Разные T)')
-    #     plt.xlabel('Время')
-    #     plt.ylabel('Амплитуда')
-    #     plt.legend()
 
     plt.tight_layout()
     plt.show()

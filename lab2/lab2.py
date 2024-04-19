@@ -203,7 +203,7 @@ def secondTask():
 def thirdTask():
     path = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "\\data\\lab2\\audio.mp3"
     print(path)
-    y = readAudio(path)
+    y, _ = readAudio(path)
 
     t = np.linspace(0, len(y), len(y))
     draw([Plot(t, y, "t", None)],

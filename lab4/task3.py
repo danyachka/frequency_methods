@@ -30,15 +30,8 @@ def apply_filter(data, time_constant):
     b = np.poly1d([1])
     a = np.poly1d([1 + time_constant, -time_constant])
 
-    # filter_ = signal.TransferFunction([1], [time_constant, 1])
-    # _, y1, _ = signal.lsim(filter_, U=data['<CLOSE>'], T=data.index.astype("int64"))
-    # return filter_
-
     zi = signal.lfilter_zi(b, a)
     filtered, _ = signal.lfilter(b, a, data, zi=zi * data[0])
-    # filtered, _ = signal.lfilter(b, a, filtered, zi=zi*filtered[0])
-
-    # filtered = signal.filtfilt(b, a, data)
     return filtered
 
 
@@ -65,7 +58,6 @@ def main():
         tag = TTags[time_constant]
         filtered_data = apply_filter(data["<CLOSE>"], time_constant)
 
-        # plt.subplot(len(time_constants), 1, idx)
         plt.plot(data.index, data['<CLOSE>'], label='Исходные данные', color='blue', alpha=0.7)
 
         plt.plot(data.index, filtered_data, label=f'Фильтр, T = {tag}', color='red')
