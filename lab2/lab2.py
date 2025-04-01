@@ -1,4 +1,10 @@
+from operator import truediv
+from signal import signal
+
 import numpy as np
+from numpy import ndarray
+from pydub.pyaudioop import reverse
+
 from utils import Plot, draw, readAudio
 import os
 from colorama import Fore, Style
@@ -27,7 +33,9 @@ def f1_f(w, index=0):
     a = aList[index]
     b = bList[index]
 
-    y = 2 * a * b * np.sinc(b * w / np.pi) / (2 * np.pi)**0.5
+    # y = 2 * a * b * np.sinc(b * w / np.pi) / (2 * np.pi)**0.5
+    # y = a*b*2**0.5 * np.sinc(b*w)
+    y = 2*a/((2 * np.pi)**0.5 * w) * np.sin(b*w)
     return y
 
 
@@ -50,7 +58,8 @@ def f2_f(w, index=0):
     a = aList[index]
     b = bList[index]
 
-    yf = 2 * a * (np.sin(b * w) / (np.pi * w))**2
+    # yf = 2 * a * (np.sin(b * w) / (np.pi * w))**2
+    yf = a*2**0.5/(b * w**2 * np.pi**0.5) * (1 - np.cos(w*b))
     return yf
 
 
@@ -105,7 +114,7 @@ def f5_f(w, index=0):
     a = aList[index]
     b = bList[index]
 
-    y = 2**0.5 * a / (b + 2j * np.pi * w)
+    y = (a*b*2**0.5) / (np.pi**0.5 * (w**2 + b**2))
     return y
 
 
@@ -115,23 +124,20 @@ def f4_2(t, c, index=1):
 
 
 def f4_2f(w, c, index=1):
-    y = f4_f(w, index) * np.exp(-2j * np.pi * w * c)
+    y = np.exp(-1j * w * c)/np.sqrt(2*np.pi) * f4_f(w, index)
     return y
 
 
-def parsevalEqualityCheck(funName, func, fourier_transform, index, interval=(-10, 10), num_points=2000):
-    x = np.linspace(interval[0], interval[1], num_points)
-    dx = (interval[1] - interval[0]) / num_points
+def parseval_equality_check(label, y, yf, t):
+    integral_func_squared = np.trapezoid(np.abs(y) ** 2, t)
 
-    integral_func_squared = np.trapz(np.abs(func(x, index)) ** 2, dx=dx)
-
-    integral_fourier_squared = np.trapz(np.abs(fourier_transform(x, index)) ** 2, dx=dx)
+    integral_fourier_squared = np.trapezoid(np.abs(yf) ** 2, t)
 
     parseval_equality = np.isclose(integral_func_squared, integral_fourier_squared, rtol=1e-1)
 
-    print("\n" + "Проверка равенства Парсеваля для " + Fore.GREEN + funName + Fore.RESET)
-    print(f'f(x): {Fore.BLUE}{integral_func_squared}{Fore.RESET}')
-    print(f'f^(w): {Fore.BLUE}{integral_fourier_squared}{Fore.RESET}')
+    print("\n" + "Проверка равенства Парсеваля для " + Fore.GREEN + label + Fore.RESET)
+    print(f'f(x): {Fore.BLUE}{integral_func_squared: .3f}{Fore.RESET}')
+    print(f'f^(w): {Fore.BLUE}{integral_fourier_squared: .3f}{Fore.RESET}')
     if parseval_equality:
         print(f"Равенство {Fore.GREEN}выполняется{Fore.RESET}")
     else:
@@ -140,7 +146,7 @@ def parsevalEqualityCheck(funName, func, fourier_transform, index, interval=(-10
     return parseval_equality
 
 
-def drawFunAndFf(f, ff, t, index, tLim, l):
+def draw_func_and_ff(f, ff, t, index, tLim, l):
     a = aList[index]
     b = bList[index]
 
@@ -152,30 +158,30 @@ def drawFunAndFf(f, ff, t, index, tLim, l):
     draw([Plot(t, y, "t", " f(t)")],
          label + " (f(t))", limits=(tLim, 0))
 
-    draw([Plot(t, yf, "v", " f^(v)")],
-         label + " (f^(v))", limits=(tLim, 0))
+    draw([Plot(t, yf, "w", " f^(w)")],
+         label + " (f^(w))", limits=(tLim, 0))
 
-    parsevalEqualityCheck(l, f, ff, index)
+    parseval_equality_check(f'{l}({a=}, {b=})', y, yf, t)
 
 
-def drawFirstDefault():
+def draw_first_default():
     tLim = 5
     t = np.linspace(-tLim, tLim, 1000)
 
     # for i in range(len(aList)):
     for i in range(3):
-        #drawFunAndFf(f1, f1_f, t, i, tLim, "Прямоугольная функция")
+        # draw_func_and_ff(f1, f1_f, t, i, tLim, "Прямоугольная функция")
 
-        #drawFunAndFf(f2, f2_f, t, i, tLim, "Треугольная функция")
+        # draw_func_and_ff(f2, f2_f, t, i, tLim, "Треугольная функция")
 
-        #drawFunAndFf(f3, f3_f, t, i, tLim, "Кардинальный синус")
+        # draw_func_and_ff(f3, f3_f, t, i, tLim, "Кардинальный синус")
 
-        #drawFunAndFf(f4, f4_f, t, i, tLim, "Функция Гаусса")
+        # draw_func_and_ff(f4, f4_f, t, i, tLim, "Функция Гаусса")
 
-        drawFunAndFf(f5, f5_f, t, i, tLim, "Двустороннее затухание")
+        draw_func_and_ff(f5, f5_f, t, i, tLim, "Двустороннее затухание")
 
 
-def secondTask():
+def second_task():
     tLim = 5
     w = np.linspace(-tLim, tLim, 1000)
 
@@ -189,18 +195,16 @@ def secondTask():
         gf = f4_2f(w, c)
 
         re = np.real(gf)
-        draw([Plot(w, re, "w", "Re g^(w)")],
-             "Вещественная часть, c = " + str(c), setLimits=False)
         im = np.imag(gf)
-        draw([Plot(w, im, "w", "Im g^(w)")],
-             "Мнимая часть, c = " + str(c), setLimits=False)
+        draw([Plot(w, im, "w", "Im g^(w)"), Plot(w, re, "w", "Re g^(w)")],
+             "c = " + str(c), setLimits=False)
 
         module = abs(gf)
         draw([Plot(w, module, "w", "abs(g^(w))")],
              "Модуль, c = " + str(c), setLimits=False)
 
 
-def thirdTask():
+def third_task():
     path = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + "\\data\\lab2\\audio.mp3"
     print(path)
     y, _ = readAudio(path)
@@ -210,36 +214,23 @@ def thirdTask():
          "Аудиозапись, f(t)", setLimits=False)
 
     V = 1000
-    v = [i for i in range(-V + 1, V)]
+    s: ndarray = np.array([
+        [v, abs(np.trapezoid(t, y * np.exp(-2j * np.pi * v * t)))]
+        for v in range(0, V)
+    ])
 
-    Y = np.zeros(len(v))
+    draw([Plot(s[:, 0], s[:, 1], "Частоты", None)],
+         "Аудиозапись, abs(f^(v))", setLimits=False)
 
-    for k in range(len(v)):
-        Y[k] = abs(np.trapz(t, y * np.exp(-2j * np.pi * v[k] * t)))
-
-    draw([Plot(v, Y, "Частоты", None)],
-         "Аудиозапись, abs(f^(t))", setLimits=False)
-
-    highest = []
-    for i in range(V):
-        level = Y[i]
-        if level > 3:
-            append = True
-            for h in highest:
-                append = abs(h - i) > 20
-                if not append:
-                    continue
-
-            if append:
-                highest.append(i)
-
-    print(f'Наиболее часто используемые частоты:\n{highest}')
+    highest = sorted(s, key=lambda x: x[1])
+    string = "\n".join([f"v = {v[0]: .0f}, {v[1]: .3f}" for v in highest])
+    print(f'Наиболее часто используемые частоты:\n{string}')
 
 
 def main():
-    #drawFirstDefault()
-    #secondTask()
-    thirdTask()
+    # draw_first_default()
+    # second_task()
+    third_task()
 
 
 if __name__ == '__main__':

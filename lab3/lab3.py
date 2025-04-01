@@ -103,8 +103,8 @@ def main():
         drawPlots([plots_0, plots_1], (2, 1), frames)
 
 
-    first()
-    second()
+    # first()
+    # second()
     third()
 
 
@@ -152,5 +152,5 @@ def task_2():
 
 
 if __name__ == '__main__':
-    main()
-    #task_2()
+    # main()
+    task_2()

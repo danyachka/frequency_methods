@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
 import librosa
-import pydub
+from pathlib import Path
 import numpy as np
 from scipy.io.wavfile import write
-import os
 
 
 class Plot:
@@ -107,9 +106,9 @@ def readAudio(f):
     return y, sr
 
 
-def saveWavAudio(data, sr, tag):
-    tag = os.path.dirname(os.path.realpath(__file__)) + "\\result\\" + tag
+def saveWavAudio(data, sr, path):
+    path = Path(__file__).absolute().parent.joinpath('result').joinpath(path)
 
     scaled_data = np.int16(data * 32767)
 
-    write(tag, sr, scaled_data)
+    write(path, sr, scaled_data)
