@@ -52,24 +52,16 @@ def f_r(t):
 
 
 def f_complex(space):
-    T = t4_c - t0_c
-    result = np.zeros(len(space), dtype=complex)
+    c = np.zeros(len(space), dtype=np.complex128)
 
     for i in range(len(space)):
-        t = space[i] % T
+        t = space[i]
 
-        if t < t1_c:
-            result[i] = R_c + 1j*t*R_c/T_c
-        elif t < t2_c:
-            t -= t1_c
-            result[i] = 2*R_c - 8*R_c*t/T_c + 1j*R_c #(8 - t) + 2j
-        elif t < t3_c:
-            t -= t2_c
-            result[i] = -R_c + 1j*(4*R_c - 8*R_c*t/T_c)#(3 - t) + 1j * (0.375 * t - 5)
-        elif t <= t4_c:
-            t -= t3_c
-            result[i] = (-6*R_c - 8*R_c*t/T_c - 1j*R_c)#(t - 5) + 1j * (2 * t - 2)
-    return result
+        if t0_c <= t < t1_c: c[i] = R_c + 8j*t*R_c/T_c
+        elif  t1_c <= t < t2_c: c[i] = 2*R_c - 8*R_c*t/T_c + 1j*R_c #(8 - t) + 2j
+        elif  t2_c <= t < t3_c: c[i] = -R_c + 1j*(4*R_c - 8*R_c*t/T_c)#(3 - t) + 1j * (0.375 * t - 5)
+        elif  t3_c <= t <= t4_c: c[i] = -6*R_c + 8*R_c*t/T_c - 1j*R_c#(t - 5) + 1j * (2 * t - 2)
+    return c
 
 
 def omega(n, T: float=t2-t0):
@@ -90,8 +82,8 @@ def calc_F(t, y, T, N):
     F = np.zeros_like(t)
 
     a_0 = (2 / T) * np.trapezoid(y * np.cos(omega(0) * t), t)
-    an = [(2 / T) * np.trapezoid(y * np.cos(omega(n) * t), t) for n in range(1, N + 1)]
-    bn = [(2 / T) * np.trapezoid(y * np.sin(omega(n) * t), t) for n in range(1, N + 1)]
+    an =  np.array([(2 / T) * np.trapezoid(y * np.cos(omega(n) * t), t) for n in range(1, N + 1)])
+    bn =  np.array([(2 / T) * np.trapezoid(y * np.sin(omega(n) * t), t) for n in range(1, N + 1)])
 
     F += a_0
     for i in range(len(an)):
@@ -101,21 +93,21 @@ def calc_F(t, y, T, N):
     if N == 3:
         print(f"{N=}) a_0={a_0}, an={[float(a) for a in an]}, bn={[float(b) for b in bn]}")
 
-    return F
+    return F, (a_0, an, bn)
 
 def calc_G(t, y, T, N):
     G = 0
-    cn = [
+    cn = np.array([
         (1 / T) * np.trapezoid(y * np.exp(-1j * omega(n, T) * t), t)
         for n in range(-N, N + 1)
-    ]
+    ])
     for i in range(len(cn)):
         n = i - N
         G += cn[i] * (np.exp(1j * omega(n, T) * t))
 
     if N == 3:
         print(f'{N=} cn={[complex(cn[i + 1]) for i in range(len(cn) - 2)]}')
-    return G
+    return G, cn
 
 def F_G_N(t, y, label, isSquare=False):
     plots = [Plot(t, y, "t", "f(t)")]
@@ -124,8 +116,8 @@ def F_G_N(t, y, label, isSquare=False):
     T = t2 - t0
 
     for N in NList:
-        F = calc_F(t, y, T, N)
-        G = calc_G(t, y, T, N)
+        F, _ = calc_F(t, y, T, N)
+        G, _ = calc_G(t, y, T, N)
 
         draw([(Plot(t, F, "t", "Fn(t) N = " + str(N)))], label,  T=t2-t0)
         draw([Plot(t, G, "t", "Gn(t) N = " + str(N))], label,  T=t2-t0)
@@ -173,6 +165,10 @@ def calc_persival_equality_c(ft, T, t, N):
     # print_results('c', c)
 
     # c_sum = 2 * np.pi * np.sum(np.abs(c) ** 2)
+    print(2 * np.pi * np.trapezoid(abs(c) ** 2, omega_n_c))
+    print(np.trapezoid(abs(c) ** 2, omega_n_c))
+    print(np.trapezoid(abs(c) ** 2))
+    print(np.sum(abs(c) ** 2))
     return 2 * np.pi * np.trapezoid(abs(c) ** 2, omega_n_c)
 
 
@@ -188,22 +184,22 @@ def create_default_plot():
     perserval_equality(f_sq, 100)
     F_G_N(t, y, label)
 
-    y = f_c(t)
-    label = "Чётная функция"
-    print_title(label)
-    perserval_equality(f_c, 100)
-    F_G_N(t, y, label)
-
-    y = f_nc(t)
-    label = "Нечётная функция"
-    print_title(label)
-    perserval_equality(f_nc, 100)
-    F_G_N(t, y, label)
-
-    y = f_r(t)
-    label = "Случайная функция"
-    print_title(label)
-    F_G_N(t, y, label)
+    # y = f_c(t)
+    # label = "Чётная функция"
+    # print_title(label)
+    # perserval_equality(f_c, 100)
+    # F_G_N(t, y, label)
+    #
+    # y = f_nc(t)
+    # label = "Нечётная функция"
+    # print_title(label)
+    # perserval_equality(f_nc, 100)
+    # F_G_N(t, y, label)
+    #
+    # y = f_r(t)
+    # label = "Случайная функция"
+    # print_title(label)
+    # F_G_N(t, y, label)
 
 
 def create_complex():
@@ -215,11 +211,12 @@ def create_complex():
     label = "Комплексная функция"
 
     l = NList_c[-1]*2 + 1
-    cn_last_n = np.zeros(l, dtype=complex)
-    omg_last_n = np.zeros(l, dtype=float)
 
     for N in NList_c:
-        G = calc_G(t, c, T, N)
+        G, cn = calc_G(t, c, T, N)
+
+        if N == 100 or N == 10:
+            print(f"2pi*sum(c^2) = {T * np.sum(abs(cn) ** 2)}")
 
         G_r = np.real(G)
         G_i = np.imag(G)
@@ -227,14 +224,14 @@ def create_complex():
         draw([Plot(t, G_r, "t", "G_r_n(t) n = " + str(N))], label + " G_r(t)", setLimits=False)
         draw([Plot(G_r, G_i, "t", "Gn(t) n = " + str(N))], label, setLimits=False)
 
-    print(len(cn_last_n))
     print(f"norm = {calc_norm(c, t)}")
-    print(f"2pi*sum(c^2) = {T * np.sum(abs(cn_last_n)**2)}")
 
-    draw([Plot(np.real(c), np.imag(c), "Re{f(t)}", "Im{f(t)}")], label, setLimits=False)
+    draw([Plot(np.real(c), np.imag(c), "Re{f(t)}", "Im{f(t)}", style='-', color='orange')], label,
+         setLimits=False, show_legend=False)
     draw([Plot(t, np.real(c), "t", "Re{f(t)}")], label, setLimits=False)
     draw([Plot(t, np.imag(c), "t", "Im{f(t)}")], label, setLimits=False)
 
 
 if __name__ == '__main__':
-    create_complex()
+    # create_complex()
+    create_default_plot()

@@ -10,13 +10,13 @@ import os
 from colorama import Fore, Style
 
 
-aList = [2, 6, 11]
-bList = [1, 7, 9]
+a_list = [2, 6, 11]
+b_list = [1, 7, 9]
 
 
 def f1(ts, index=0):
-    a = aList[index]
-    b = bList[index]
+    a = a_list[index]
+    b = b_list[index]
 
     y = np.zeros(len(ts))
     for i in range(len(ts)):
@@ -30,8 +30,8 @@ def f1(ts, index=0):
 
 
 def f1_f(w, index=0):
-    a = aList[index]
-    b = bList[index]
+    a = a_list[index]
+    b = b_list[index]
 
     # y = 2 * a * b * np.sinc(b * w / np.pi) / (2 * np.pi)**0.5
     # y = a*b*2**0.5 * np.sinc(b*w)
@@ -40,8 +40,8 @@ def f1_f(w, index=0):
 
 
 def f2(ts, index=0):
-    a = aList[index]
-    b = bList[index]
+    a = a_list[index]
+    b = b_list[index]
 
     y = np.zeros(len(ts))
     for i in range(len(ts)):
@@ -55,8 +55,8 @@ def f2(ts, index=0):
 
 
 def f2_f(w, index=0):
-    a = aList[index]
-    b = bList[index]
+    a = a_list[index]
+    b = b_list[index]
 
     # yf = 2 * a * (np.sin(b * w) / (np.pi * w))**2
     yf = a*2**0.5/(b * w**2 * np.pi**0.5) * (1 - np.cos(w*b))
@@ -64,16 +64,16 @@ def f2_f(w, index=0):
 
 
 def f3(t, index=0):
-    a = aList[index]
-    b = bList[index]
+    a = a_list[index]
+    b = b_list[index]
 
     y = a*np.sinc(b * t)
     return y
 
 
 def f3_f(w, index=0):
-    a = aList[index]
-    b = bList[index]
+    a = a_list[index]
+    b = b_list[index]
 
     y = np.zeros(len(w))
     for i in range(len(w)):
@@ -87,32 +87,32 @@ def f3_f(w, index=0):
 
 
 def f4(t, index=0):
-    a = aList[index]
-    b = bList[index]
+    a = a_list[index]
+    b = b_list[index]
 
     y = a * np.exp(-b * t**2)
     return y
 
 
 def f4_f(w, index=0):
-    a = aList[index]
-    b = bList[index]
+    a = a_list[index]
+    b = b_list[index]
 
     y = a * (np.pi / b)**0.5 * np.exp(- (w ** 2 * np.pi ** 2) / b)
     return y
 
 
 def f5(t, index=0):
-    a = aList[index]
-    b = bList[index]
+    a = a_list[index]
+    b = b_list[index]
 
     y = a * np.exp(-b * abs(t))
     return y
 
 
 def f5_f(w, index=0):
-    a = aList[index]
-    b = bList[index]
+    a = a_list[index]
+    b = b_list[index]
 
     y = (a*b*2**0.5) / (np.pi**0.5 * (w**2 + b**2))
     return y
@@ -146,9 +146,11 @@ def parseval_equality_check(label, y, yf, t):
     return parseval_equality
 
 
-def draw_func_and_ff(f, ff, t, index, tLim, l):
-    a = aList[index]
-    b = bList[index]
+def draw_func_and_ff(f, ff, index, t_lim, l):
+    t = np.linspace(-t_lim, t_lim, 5000)
+
+    a = a_list[index]
+    b = b_list[index]
 
     label = l + f' (a = {a}, b = {b})'
 
@@ -156,29 +158,26 @@ def draw_func_and_ff(f, ff, t, index, tLim, l):
 
     yf = ff(t, index)
     draw([Plot(t, y, "t", " f(t)")],
-         label + " (f(t))", limits=(tLim, 0))
+         label + " (f(t))", limits=(t_lim, 0))
 
     draw([Plot(t, yf, "w", " f^(w)")],
-         label + " (f^(w))", limits=(tLim, 0))
+         label + " (f^(w))", limits=(t_lim, 0))
 
     parseval_equality_check(f'{l}({a=}, {b=})', y, yf, t)
 
 
 def draw_first_default():
-    tLim = 5
-    t = np.linspace(-tLim, tLim, 1000)
-
-    # for i in range(len(aList)):
     for i in range(3):
-        # draw_func_and_ff(f1, f1_f, t, i, tLim, "Прямоугольная функция")
+        t_lim = b_list[i] * 5
+        draw_func_and_ff(f1, f1_f, i, t_lim/3, "Прямоугольная функция")
 
-        # draw_func_and_ff(f2, f2_f, t, i, tLim, "Треугольная функция")
+        # draw_func_and_ff(f2, f2_f, i,  b_list[i] * 3, "Треугольная функция")
 
-        # draw_func_and_ff(f3, f3_f, t, i, tLim, "Кардинальный синус")
+        # draw_func_and_ff(f3, f3_f, i, t_lim, "Кардинальный синус")
 
-        # draw_func_and_ff(f4, f4_f, t, i, tLim, "Функция Гаусса")
+        # draw_func_and_ff(f4, f4_f, i, t_lim, "Функция Гаусса")
 
-        draw_func_and_ff(f5, f5_f, t, i, tLim, "Двустороннее затухание")
+        # draw_func_and_ff(f5, f5_f, i, t_lim, "Двустороннее затухание")
 
 
 def second_task():
@@ -228,9 +227,9 @@ def third_task():
 
 
 def main():
-    # draw_first_default()
+    draw_first_default()
     # second_task()
-    third_task()
+    # third_task()
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import utils
-from utils import draw, drawPlots, Plot, FrameInfo
+from utils import draw, draw_plots, Plot, FrameInfo
 
 
 def get_fourier(u, dt):
@@ -50,7 +50,7 @@ def main():
                    Plot(v_f, abs(fourier_f), "v", "Модуль Фурье-образа фильтрованного сигнала")]
         frames.append(FrameInfo("Модули Фурье-образов", "v", "Мощность"))
 
-        drawPlots([plots_0, plots_1], (2, 1), frames)
+        draw_plots([plots_0, plots_1], (2, 1), frames)
 
     def second():
         c = 0.5
@@ -75,7 +75,7 @@ def main():
                    Plot(v_f, abs(fourier_f), "v", "Модуль Фурье-образа фильтрованного сигнала")]
         frames.append(FrameInfo("Модули Фурье-образов", "v", "Мощность"))
 
-        drawPlots([plots_0, plots_1], (2, 1), frames)
+        draw_plots([plots_0, plots_1], (2, 1), frames)
 
     def third():
         c = 1
@@ -100,7 +100,7 @@ def main():
                    Plot(v_f, abs(fourier_f), "v", "Модуль Фурье-образа фильтрованного сигнала")]
         frames.append(FrameInfo("Модули Фурье-образов", "v", "Мощность"))
 
-        drawPlots([plots_0, plots_1], (2, 1), frames)
+        draw_plots([plots_0, plots_1], (2, 1), frames)
 
 
     # first()
@@ -128,25 +128,25 @@ def task_2():
     soundPlot = Plot(t, y, "", "Оригинальная дорожка")
 
     v, fourier = get_fourier(y, dt)
-    fourierPlot = Plot(v, fourier.copy(), "", "Фурье-образ оригинальной дорожки")
+    fourier_plot = Plot(v, fourier.copy(), "", "Фурье-образ оригинальной дорожки")
 
     # clearing
     v_abs = abs(v)
-    clearedFourier = np.where((v_abs > 1960), fourier, 0)
-    clearedFourier = np.where(abs(clearedFourier.real) < 1000, clearedFourier, 0)
+    cleared_fourier = np.where((v_abs > 1960), fourier, 0)
+    cleared_fourier = np.where(abs(cleared_fourier.real) < 1000, cleared_fourier, 0)
 
-    clearedFourierPlot = Plot(v, clearedFourier, "", "Отчищенный Фурье-образ", alpha=0.6)
+    cleared_fourier_plot = Plot(v, cleared_fourier, "", "Отчищенный Фурье-образ", alpha=0.6)
 
-    result = get_reversed_fourier(clearedFourier)
+    result = get_reversed_fourier(cleared_fourier)
     result[:350] = 0
     result[len(result) - 350:] = 0
-    clearedSoundPlot = Plot(t, result, "", "Отчищенная дорожка")
+    cleared_sound_plot = Plot(t, result, "", "Отчищенная дорожка")
 
     frames = [FrameInfo("График аудио", "Время", "Амплитуда"),
               FrameInfo("Модуль Фурье-образа", "Частота", "Мощность",
                         xLimits=(0, 2000))]
-    drawPlots([[soundPlot, clearedSoundPlot],
-               [fourierPlot, clearedFourierPlot]], (2, 1), frames)
+    draw_plots([[soundPlot, cleared_sound_plot],
+                [fourier_plot, cleared_fourier_plot]], (2, 1), frames)
 
     utils.saveWavAudio(result, sr, "result.wav")
 

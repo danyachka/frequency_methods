@@ -8,8 +8,8 @@ def fourier_transform_trapezoidal(signal, dt, t):
     v = np.fft.fftshift(v)
     fourier = np.zeros(N, dtype=complex)
 
-    for i, currentW in enumerate(v):
-        fourier[i] = np.trapz(signal * np.exp(-2j * np.pi * currentW * t), t)
+    for i, current_w in enumerate(v):
+        fourier[i] = np.trapezoid(signal * np.exp(-2j * np.pi * current_w * t), t)
 
     return v, fourier
 

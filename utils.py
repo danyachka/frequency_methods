@@ -7,13 +7,14 @@ from scipy.io.wavfile import write
 
 class Plot:
 
-    def __init__(self, x, y, xLabel="", yLabel="", color=None, alpha=1):
+    def __init__(self, x, y, xLabel="", yLabel="", color=None, alpha=1, style='-'):
         self.x = x
         self.y = y
         self.xLabel = xLabel
         self.yLabel = yLabel
         self.color = color
         self.alpha = alpha
+        self.style = style
 
 
 class FrameInfo:
@@ -26,7 +27,7 @@ class FrameInfo:
         self.yLimits = yLimits
 
 
-def draw(plots: Plot | list[Plot], title: str, setLimits=True, limits=(2.5, 1.2), T=None):
+def draw(plots: Plot | list[Plot], title: str, setLimits=True, limits=(2.5, 1.2), show_legend=True, T=None):
     if isinstance(plots, Plot):
         plots = [plots]
     if len(plots) == 0:
@@ -42,10 +43,10 @@ def draw(plots: Plot | list[Plot], title: str, setLimits=True, limits=(2.5, 1.2)
         plot, color = plots[i], colors[i % len(colors)]
         x, y, xLabel, yLabel = plot.x, plot.y, plot.xLabel, plot.yLabel
 
-        ax.plot(x, y, "-")
+        ax.plot(x, y,  plot.style, color=plot.color, alpha=plot.alpha)
         if isPeriodic:
-            ax.plot(x - T, y, "-")
-            ax.plot(x + T, y, "-")
+            ax.plot(x - T, y, plot.style, color=plot.color, alpha=plot.alpha)
+            ax.plot(x + T, y,  plot.style, color=plot.color, alpha=plot.alpha)
 
         if yLabel is not None:
             labelsY.append(yLabel)
@@ -54,7 +55,7 @@ def draw(plots: Plot | list[Plot], title: str, setLimits=True, limits=(2.5, 1.2)
     plt.xlabel(labelsX[0])
     if len(labelsY) != 0:
         plt.ylabel(labelsY[0])
-        plt.legend(labelsY)
+        if show_legend: plt.legend(labelsY)
 
     if setLimits:
         if limits[0] != 0:
@@ -67,12 +68,12 @@ def draw(plots: Plot | list[Plot], title: str, setLimits=True, limits=(2.5, 1.2)
     plt.show()
 
 
-def drawPlots(plotsLists: list[list[Plot]], size, frameInfoLists: list[FrameInfo]):
+def draw_plots(plots_lists: list[list[Plot]], size, frame_info_lists: list[FrameInfo]):
     colors = ["r", "b", "g", "p"]
     plt.figure(figsize=(12, 12))
 
-    for i, plots in enumerate(plotsLists):
-        frameInfo = frameInfoLists[i]
+    for i, plots in enumerate(plots_lists):
+        frame_info = frame_info_lists[i]
 
         plt.subplot(size[0], size[1], i + 1)
 
@@ -83,15 +84,15 @@ def drawPlots(plotsLists: list[list[Plot]], size, frameInfoLists: list[FrameInfo
 
             plt.plot(plot.x, plot.y, label=plot.yLabel, color=color, alpha=plot.alpha)
 
-        plt.xlabel(frameInfo.x)
-        plt.ylabel(frameInfo.y)
-        plt.title(frameInfo.title)
+        plt.xlabel(frame_info.x)
+        plt.ylabel(frame_info.y)
+        plt.title(frame_info.title)
 
-        if frameInfo.xLimits is not None:
-            plt.xlim(frameInfo.xLimits[0], frameInfo.xLimits[1])
+        if frame_info.xLimits is not None:
+            plt.xlim(frame_info.xLimits[0], frame_info.xLimits[1])
 
-        if frameInfo.yLimits is not None:
-            plt.ylim(frameInfo.yLimits[0], frameInfo.yLimits[1])
+        if frame_info.yLimits is not None:
+            plt.ylim(frame_info.yLimits[0], frame_info.yLimits[1])
 
         plt.grid(True)
         plt.legend()
